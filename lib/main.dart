@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:acoms_app/widgets/home.dart';
+import 'package:acoms_app/views/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         textTheme: const TextTheme(
-          titleLarge: TextStyle(color: Colors.white, fontFamily: 'Alliance2', fontStyle: FontStyle.italic),
+          titleLarge: TextStyle(color: Colors.white, fontFamily: 'Alliance2'),
           bodyMedium: TextStyle(color: Colors.white, letterSpacing: -2),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(

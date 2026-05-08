@@ -1,3 +1,4 @@
+import 'package:acoms_app/models/service.dart';
 import 'package:acoms_app/remote.dart';
 import 'package:acoms_app/widgets/cards.dart';
 import 'package:acoms_app/widgets/fictional.dart';
@@ -110,7 +111,7 @@ class _ServicesSectionState extends State<ServicesSection> {
   final Remote remote = Remote();
   final DateFormat lastSyncFormatter = DateFormat('HH:mm:ss');
 
-  Future<List<Map<String, dynamic>?>> loadingFuture = Future.value([]);
+  Future<List<Service>> loadingFuture = Future.value([]);
   int lastUpdate = 0;
 
   @override
@@ -132,14 +133,11 @@ class _ServicesSectionState extends State<ServicesSection> {
 
   void _loadData() {
     setState(() {
-      loadingFuture = Future.wait([
-        remote.fetchServiceData(),
-        remote.fetchStatusData(),
-      ]);
+      loadingFuture = remote.services.retrieve();
     });
 
     loadingFuture.then((data) {
-      if (data[0] != null && data[1] != null) {
+      if (data.isNotEmpty) {
         setState(() {
           lastUpdate = DateTime.now().millisecondsSinceEpoch;
         });
@@ -149,7 +147,7 @@ class _ServicesSectionState extends State<ServicesSection> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>?>>(
+    return FutureBuilder<List<Service>?>(
       future: loadingFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting ||
@@ -161,11 +159,10 @@ class _ServicesSectionState extends State<ServicesSection> {
               padding: EdgeInsets.symmetric(vertical: 32),
             ),
           );
-        } else if (snapshot.hasError || snapshot.data![0] == null || snapshot.data![1] == null) {
+        } else if (snapshot.hasError || snapshot.data == null) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          final entries = snapshot.data![0]!.entries.toList();
-          final statuses = snapshot.data![1]!;
+          final entries = snapshot.data!;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -177,9 +174,9 @@ class _ServicesSectionState extends State<ServicesSection> {
               ...entries.indexed.map(
                 (entry) => ServiceCard(
                   isLast: entry.$1 == entries.length - 1,
-                  name: entry.$2.value['name'],
-                  description: entry.$2.value['description'],
-                  status: statuses[entry.$2.key] == 'healthy'
+                  name: entry.$2.name,
+                  description: entry.$2.description,
+                  status: entry.$2.status == 'healthy'
                       ? 'ONLINE'
                       : 'OFFLINE',
                 ),

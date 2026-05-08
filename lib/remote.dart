@@ -1,13 +1,46 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'models/service.dart';
 import 'package:http/http.dart' as http;
+
+class Services {
+  final Remote remote;
+  List<Service> _cache = [];
+
+  Services(this.remote);
+
+  Future<List<Service>> retrieve({bool skipCache = false}) async {
+    if (skipCache || _cache.isEmpty) {
+      final [serviceData, statusData] = await Future.wait([
+        remote.fetchServiceData(),
+        remote.fetchStatusData()
+      ]);
+      if (serviceData != null) {
+        _cache = serviceData.entries
+            .map((s) => Service(
+                  id: s.key,
+                  name: s.value['name'],
+                  description: s.value['description'],
+                  host: s.value['host'],
+                  status: statusData?[s.key] ?? 'unknown',
+                ))
+            .toList();
+      } else {
+        log('Failed to fetch service data');
+      }
+    }
+    return _cache;
+  }
+}
 
 class Remote {
   static const String apiBaseUrl = 'https://acoms.carl-vbn.dev';
   late String apiKey;
+  late Services services;
 
   Remote() {
     apiKey = const String.fromEnvironment('API_KEY');
+    services = Services(this);
   }
 
   Future<Map<String, dynamic>?> _get(String endpoint) async {
