@@ -179,3 +179,34 @@ class FiButton extends StatelessWidget {
     );
   }
 }
+
+class FiSelector extends StatelessWidget {
+  final List<String> options;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  const FiSelector({super.key, required this.options, required this.selectedIndex, required this.onSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+      padding: EdgeInsets.all(8),
+      child: Row(
+        spacing: 5,
+        children: List.generate(
+          options.length,
+          (index) => TextButton(
+            onPressed: () => onSelected(index),
+            style: TextButton.styleFrom(
+              backgroundColor: selectedIndex == index ? FiColors.controlBorder : Colors.black,
+              overlayColor: FiColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
+            child: Text(options[index], style: TextStyle(fontSize: 8, color: FiColors.mainText))
+          ),
+        ),
+      )
+    );
+  }
+}

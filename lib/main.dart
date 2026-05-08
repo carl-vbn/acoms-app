@@ -66,10 +66,11 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
+          scrolledUnderElevation: 0.0,
           elevation: 0,
         ),
         fontFamily: 'OCR-B',
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.orange,
         scaffoldBackgroundColor: Colors.black,
         shadowColor: Colors.transparent,
         cardTheme: CardThemeData(

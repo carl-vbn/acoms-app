@@ -49,8 +49,8 @@ class Stats {
         sliceEnd: statsData['slice_end'],
         sessionCount: statsData['session_count'],
         actorCount: statsData['actor_count'],
-        sessionsPerActor: statsData['sessions_per_actor'],
-        viewsPerSession: statsData['views_per_session'],
+        sessionsPerActor: statsData['sessions_per_actor'].toDouble(),
+        viewsPerSession: statsData['views_per_session'].toDouble(),
         pageViewsPerDay: statsData['page_views_per_day'] != null ? List<int>.from(statsData['page_views_per_day']) : null,
         uniqueActorsPerDay: statsData['unique_actors_per_day'] != null ? List<int>.from(statsData['unique_actors_per_day']) : null,
       );
