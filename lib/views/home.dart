@@ -83,7 +83,7 @@ class Home extends StatelessWidget {
               label: const Text('Reload All', style: TextStyle(color: FiColors.primary)),
               style: ElevatedButton.styleFrom(
                 side: BorderSide.none,
-                backgroundColor: FiColors.backgroundHighlight,
+                backgroundColor: FiColors.border,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
@@ -133,7 +133,7 @@ class _ServicesSectionState extends State<ServicesSection> {
 
   void _loadData() {
     setState(() {
-      loadingFuture = remote.services.retrieve();
+      loadingFuture = remote.services.retrieve(skipCache: true);
     });
 
     loadingFuture.then((data) {
@@ -174,11 +174,7 @@ class _ServicesSectionState extends State<ServicesSection> {
               ...entries.indexed.map(
                 (entry) => ServiceCard(
                   isLast: entry.$1 == entries.length - 1,
-                  name: entry.$2.name,
-                  description: entry.$2.description,
-                  status: entry.$2.status == 'healthy'
-                      ? 'ONLINE'
-                      : 'OFFLINE',
+                  service: entry.$2,
                 ),
               ),
             ],
@@ -269,14 +265,13 @@ class _TerminalsSectionState extends State<TerminalsSection> {
                     'Last synced: ${lastSyncFormatter.format(DateTime.fromMillisecondsSinceEpoch(lastUpdate))}',
               ),
               ...entries.indexed.map(
-                (entry) => ServiceCard(
+                (entry) => TerminalCard(
                   isLast: entry.$1 == entries.length - 1,
                   name: entry.$2.value['name'],
-                  description:
-                      'Last seen: ${formatter.format(DateTime.fromMillisecondsSinceEpoch(entry.$2.value['last_seen'] * 1000))}',
+                  description: 'Last seen: ${formatter.format(DateTime.fromMillisecondsSinceEpoch(entry.$2.value['last_seen'] * 1000))}',
                   status: entry.$2.value['last_seen'] >= timestamp5MinutesAgo
-                      ? 'ONLINE'
-                      : 'OFFLINE',
+                    ? 'ONLINE'
+                    : 'OFFLINE',
                 ),
               ),
             ],

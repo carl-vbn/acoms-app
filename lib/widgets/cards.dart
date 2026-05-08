@@ -1,19 +1,22 @@
+import 'package:acoms_app/models/service.dart';
+import 'package:acoms_app/views/service.dart';
 import 'package:flutter/material.dart';
-import 'package:acoms_app/widgets/status_indicator.dart';
 import 'package:acoms_app/widgets/fictional.dart';
 
-class ServiceCard extends StatelessWidget {
+class GenericRowCard extends StatelessWidget {
   final bool isLast;
   final String name;
   final String description;
   final String status;
+  final VoidCallback? onTap;
 
-  const ServiceCard({
+  const GenericRowCard({
     super.key,
     required this.isLast,
     required this.name,
     required this.description,
     required this.status,
+    this.onTap,
   });
 
   @override
@@ -26,9 +29,9 @@ class ServiceCard extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: FiColors.backgroundHighlight, width: 2),
-                  left: BorderSide(color: FiColors.backgroundHighlight, width: 2),
-                  bottom: isLast ? BorderSide(color: FiColors.backgroundHighlight, width: 2) : BorderSide.none,
+                  top: BorderSide(color: FiColors.border, width: 2),
+                  left: BorderSide(color: FiColors.border, width: 2),
+                  bottom: isLast ? BorderSide(color: FiColors.border, width: 2) : BorderSide.none,
                 ),
                 color: FiColors.controlBackground,
               ),
@@ -66,22 +69,35 @@ class ServiceCard extends StatelessWidget {
               ),
             ),
           ),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              backgroundColor: FiColors.backgroundHighlight,
-              overlayColor: FiColors.primary,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
-                side: BorderSide.none,
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: FiColors.border, width: 2),
+                right: BorderSide(color: FiColors.border, width: 2),
+                left: BorderSide(color: FiColors.border, width: 2),
+                bottom: isLast ? BorderSide(color: FiColors.border, width: 2) : BorderSide.none,
               ),
             ),
-            child: const Text(
-              'SHOW',
-              style: TextStyle(
-                color: FiColors.secondary,
-                fontSize: 10,
-                letterSpacing: -1,
+            child: TextButton(
+              onPressed: () {
+                if (onTap != null) {
+                  onTap!();
+                }
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.black,
+                overlayColor: FiColors.primary,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+              ),
+              child: const Text(
+                'SHOW',
+                style: TextStyle(
+                  color: FiColors.secondary,
+                  fontSize: 10,
+                  letterSpacing: -1,
+                ),
               ),
             ),
           ),
@@ -91,44 +107,52 @@ class ServiceCard extends StatelessWidget {
   }
 }
 
-class TerminalCard extends StatelessWidget {
-  const TerminalCard({super.key});
+class ServiceCard extends StatelessWidget {
+  final Service service;
+  final bool isLast;
+
+  const ServiceCard({super.key, required this.service, required this.isLast});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: () {
-          // Handle card tap
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'Terminal Title',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  const Spacer(),
-                  const StatusIndicator()
-                ],
-              ),
-              const SizedBox(height: 8),
-              const Text("Windows 11 Home"),
-              const SizedBox(height: 12),
-              const Text(
-                'Last Request: 2024-06-01 12:00 PM\nLast Updated: 2024-06-01 12:00 PM',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
+    return GenericRowCard(
+      isLast: isLast,
+      name: service.name,
+      description: service.description,
+      status: service.status == 'healthy' ? 'ONLINE' : 'OFFLINE',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ServiceView(service: service),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  }
+}
+
+class TerminalCard extends StatelessWidget {
+  final String name;
+  final String description;
+  final String status;
+  final bool isLast;
+
+  const TerminalCard({
+    super.key,
+    required this.name,
+    required this.description,
+    required this.status,
+    required this.isLast,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GenericRowCard(
+      isLast: isLast,
+      name: name,
+      description: description,
+      status: status,
     );
   }
 }

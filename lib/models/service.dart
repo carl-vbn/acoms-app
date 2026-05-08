@@ -4,6 +4,7 @@ class Service {
   final String description;
   final String host;
   final String status;
+  final bool https;
 
   Service({
     required this.id,
@@ -11,5 +12,8 @@ class Service {
     required this.description,
     required this.host,
     required this.status,
+    this.https = false,
   });
+
+  String get url => '${https ? 'https' : 'http'}://$host';
 }
