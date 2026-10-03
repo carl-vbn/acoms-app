@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:acoms_app/models/stats.dart';
 
 import 'models/service.dart';
@@ -95,6 +96,33 @@ class Remote {
     }
   }
   
+  Future<Map<String, dynamic>?> _put(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
+    late http.Response response;
+    try {
+      response = await http.put(
+        Uri.parse('$apiBaseUrl/$endpoint'),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
+    } catch (e) {
+      log('Error posting data to $endpoint: $e');
+      return null;
+    }
+
+    if (response.statusCode == 200) {
+      return response.body.isEmpty ? {} : json.decode(response.body);
+    } else {
+      log('Error posting data: ${response.statusCode}');
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>?> fetchServiceData() async {
     return await _get('services');
   }
@@ -109,5 +137,13 @@ class Remote {
 
   Future<bool> heartbeat() async {
     return await _get('heartbeat') != null;
+  }
+
+  Future<bool> registerPushToken(String token) async {
+    return await _put('fcm/token', {
+          'token': token,
+          'platform': Platform.operatingSystem
+        }) !=
+        null;
   }
 }

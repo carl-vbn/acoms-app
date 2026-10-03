@@ -1,58 +1,23 @@
-import 'dart:io';
+import 'dart:developer';
+
+import 'package:acoms_app/notifications.dart';
+import 'package:acoms_app/remote.dart';
 import 'package:acoms_app/views/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-final FlutterLocalNotificationsPlugin _notifications =
-    FlutterLocalNotificationsPlugin();
-
-const AndroidNotificationChannel _channel = AndroidNotificationChannel(
-  'simple_channel',
-  'Simple Notifications',
-  description: 'Used for basic notifications triggered by button press',
-  importance: Importance.high,
-);
-
-Future<void> _initNotifications() async {
-  const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const linuxInit = LinuxInitializationSettings(
-    defaultActionName: 'Open',
-  );
-  const initSettings = InitializationSettings(android: androidInit, linux: linuxInit);
-  await _notifications.initialize(initSettings);
-
-  // Android-specific setup
-  final androidImpl = _notifications.resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>();
-
-  await androidImpl?.createNotificationChannel(_channel);
-
-  if (Platform.isAndroid) {
-    await androidImpl?.requestNotificationsPermission(); // Android 13+
-  }
-
-}
-
-Future<void> _showNotification() async {
-  await _notifications.show(
-    0,
-    'Hello from Flutter!',
-    'This is a simple local notification.',
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        _channel.id,
-        _channel.name,
-        channelDescription: _channel.description,
-        importance: Importance.high,
-        priority: Priority.high,
-      ),
-    ),
-  );
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _initNotifications();
+
+  final push = PushNotifications(Remote());
+  push.onOpened = (data) {
+    log('Notification opened with payload: $data');
+  };
+  try {
+    await push.init();
+  } catch (e) {
+    log('Push notification setup failed: $e');
+  }
+
   runApp(const MyApp());
 }
 

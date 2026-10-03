@@ -9,6 +9,7 @@
 .buildlog/
 .env.json
 .history
+android/app/google-services.json
 .svn/
 .swiftpm/
 migrate_working_dir/
